@@ -109,7 +109,14 @@ class grade_export_form extends moodleform {
             $mform->disabledIf('iprestriction', 'key', 'noteq', 1);
             $mform->disabledIf('validuntil', 'key', 'noteq', 1);
         }
-
+        if (!empty($features['showgroups'])) {
+            $mform->addElement('advcheckbox', 'showgroups', get_string('exportgroups', 'grades'));
+            $mform->setDefault('showgroups', 0);
+        }
+        if (!empty($features['showcohorts'])) {
+            $mform->addElement('advcheckbox', 'showcohorts', get_string('exportcohorts', 'grades'));
+            $mform->setDefault('showcohorts', 0);
+        }
         $mform->addElement('header', 'gradeitems', get_string('gradeitemsinc', 'grades'));
 
         $switch = grade_get_setting($COURSE->id, 'aggregationposition', $CFG->grade_aggregationposition);

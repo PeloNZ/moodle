@@ -5,6 +5,7 @@
 
 require_once('../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
+require_once($CFG->libdir.'/accesslib.php');
 
 $format = optional_param('format', '', PARAM_ALPHA);
 
@@ -114,6 +115,12 @@ function user_download_xls($fields) {
 
     $filename = clean_filename(get_string('users').'.xls');
 
+    // get course shortnames for column list
+    $courses = $DB->get_records('course', null, 'shortname');
+    $coursefields = array();
+    foreach ($courses as $n=>$v){
+        $coursefields[$v->id] = $v->shortname;
+    }
     $workbook = new MoodleExcelWorkbook('-');
     $workbook->send($filename);
 
@@ -122,6 +129,11 @@ function user_download_xls($fields) {
     $worksheet[0] =& $workbook->add_worksheet('');
     $col = 0;
     foreach ($fields as $fieldname) {
+        $worksheet[0]->write(0, $col, $fieldname);
+        $col++;
+    }
+    // add course shortnames to columns
+    foreach ($coursefields as $fieldname) {
         $worksheet[0]->write(0, $col, $fieldname);
         $col++;
     }
@@ -135,6 +147,14 @@ function user_download_xls($fields) {
         profile_load_data($user);
         foreach ($fields as $field=>$unused) {
             $worksheet[0]->write($row, $col, $user->$field);
+            $col++;
+        }
+        // Add course enrolment data to row
+        foreach ($coursefields as $id=>$name) {
+            $context = context_course::instance($id);
+            $status = user_has_role_assignment($userid, 5, $context->id);
+            $status = ($status === true) ?: '0';
+            $worksheet[0]->write($row, $col, $status);
             $col++;
         }
         $row++;

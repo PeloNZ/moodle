@@ -41,6 +41,22 @@ class profile_field_datetime extends profile_field_base {
     }
 
     /**
+     * Convert YYYY MM DD uploaded string to timestamp
+     *
+     * Overwrites base class accessor method
+     * @param   mixed    $data - the key returned from the select input in the form
+     * @param   stdClass $datarecord The object that will be used to save the record
+     */
+    function edit_save_data_preprocess($data, $datarecord) {
+        if (is_string($data)) {
+            $data = explode(' ', $data, 3);
+            return make_timestamp($data[0], $data[1], $data[2]);
+        } else {
+            return $data;
+        }
+    }
+
+    /**
      * Display the data for this field
      */
     function display_data() {

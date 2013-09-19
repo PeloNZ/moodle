@@ -2229,6 +2229,8 @@ class global_navigation extends navigation_node {
             $userscourses = enrol_get_users_courses($user->id);
             $userscoursesnode = $usernode->add(get_string('courses'));
 
+            $count = 0;
+            $maxnodes = $CFG->numcoursesincombo;
             foreach ($userscourses as $usercourse) {
                 $usercoursecontext = context_course::instance($usercourse->id);
                 $usercourseshortname = format_string($usercourse->shortname, true, array('context' => $usercoursecontext));
@@ -2268,6 +2270,11 @@ class global_navigation extends navigation_node {
                 }
 
                 $reporttab->trim_if_empty();
+
+                $count++;
+                if ($count > $maxnodes) {
+                    break;
+                }
             }
         }
         return true;

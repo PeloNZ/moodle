@@ -1,5 +1,5 @@
 @mod @mod_forum
-Feature: Students can choose from 4 discussion display options and their choice is remembered
+Feature: Students can choose from 5 discussion display options and their choice is remembered
   In order to read forum posts in a suitable view
   As a user
   I need to select which display method I want to use
@@ -7,13 +7,18 @@ Feature: Students can choose from 4 discussion display options and their choice 
   Background:
     Given the following "users" exist:
       | username | firstname | lastname | email |
+      | teacher1 | Teacher | 1 | teacher1@example.com |
       | student1 | Student | 1 | student1@example.com |
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1 | 0 |
     And the following "course enrolments" exist:
       | user | course | role |
+      | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
+    And the following "scales" exist:
+      | name | scale |
+      | Test Scale 1 | Useful |
     And I log in as "admin"
     And I am on site homepage
     And I follow "Course 1"
@@ -24,6 +29,11 @@ Feature: Students can choose from 4 discussion display options and their choice 
     And I add a new discussion to "Test forum name" forum with:
       | Subject | Discussion 1 |
       | Message | Discussion contents 1, first message |
+    And I follow "Edit settings"
+    And I set the field "Aggregate type" to "Count of ratings"
+    And I set the field "Type" to "Scale"
+    And I set the field "Scale" to "Test Scale 1"
+    And I press "Save and display"
     And I reply "Discussion 1" post from "Test forum name" forum with:
       | Subject | Reply 1 to discussion 1 |
       | Message | Discussion contents 1, second message |
@@ -92,3 +102,25 @@ Feature: Students can choose from 4 discussion display options and their choice 
     And the field "Display mode" matches value "Display replies in nested form"
     And I should see "Discussion contents 2, first message" in the "div.firstpost.starter" "css_element"
     And I should see "Discussion contents 2, second message" in the "div.indent div.forumpost" "css_element"
+
+  @javascript @mdl50242
+  Scenario: Display replies flat, with highest rated first
+    Given I reply "Discussion 1" post from "Test forum name" forum with:
+      | Subject | Reply 2 to discussion 1 |
+      | Message | Discussion contents 1, third message |
+    And I log out
+    And I log in as "teacher1"
+    And I follow "Course 1"
+    And I reply "Discussion 1" post from "Test forum name" forum with:
+      | Subject | Reply 3 to discussion 1 |
+      | Message | Discussion contents 1, fourth message |
+    And I set the field "Count of ratings" to "Useful"
+    When I set the field "mode" to "Display replies flat, with highest rated first"
+    Then I should see "Discussion contents 1, fourth message" in the "div.firstpost.starter" "css_element"
+    And I should see "Discussion contents 1, second message" in the "//div[contains(concat(' ', normalize-space(@class), ' '), ' forumpost ') and not(contains(@class, 'starter'))]" "xpath_element"
+    And I reply "Discussion 2" post from "Test forum name" forum with:
+      | Subject | Reply 2 to discussion 2 |
+      | Message | Discussion contents 2, third message |
+    And the field "Display mode" matches value "Display replies flat, with highest rated first"
+    And I should see "Discussion contents 2, first message" in the "div.firstpost.starter" "css_element"
+    And I should see "Discussion contents 2, second message" in the "//div[contains(concat(' ', normalize-space(@class), ' '), ' forumpost ') and not(contains(@class, 'starter'))]" "xpath_element"

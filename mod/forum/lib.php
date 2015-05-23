@@ -33,6 +33,8 @@ define('FORUM_MODE_FLATOLDEST', 1);
 define('FORUM_MODE_FLATNEWEST', -1);
 define('FORUM_MODE_THREADED', 2);
 define('FORUM_MODE_NESTED', 3);
+define('FORUM_MODE_FLATRATEDHIGHEST', 4);
+define('FORUM_MODE_FLATRATEDLOWEST', 5);
 
 define('FORUM_CHOOSESUBSCRIBE', 0);
 define('FORUM_FORCESUBSCRIBE', 1);
@@ -5540,6 +5542,8 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions = -1, $
  * @uses FORUM_MODE_FLATOLDEST
  * @uses FORUM_MODE_THREADED
  * @uses FORUM_MODE_NESTED
+ * @uses FORUM_MODE_FLATRATEDHIGHEST
+ * @uses FORUM_MODE_FLATRATEDLOWEST
  * @param stdClass $course
  * @param stdClass $cm
  * @param stdClass $forum
@@ -6997,7 +7001,9 @@ function forum_get_layout_modes() {
     return array (FORUM_MODE_FLATOLDEST => get_string('modeflatoldestfirst', 'forum'),
                   FORUM_MODE_FLATNEWEST => get_string('modeflatnewestfirst', 'forum'),
                   FORUM_MODE_THREADED   => get_string('modethreaded', 'forum'),
-                  FORUM_MODE_NESTED     => get_string('modenested', 'forum'));
+                  FORUM_MODE_NESTED     => get_string('modenested', 'forum'),
+                  FORUM_MODE_FLATRATEDHIGHEST => get_string('modeflatratedhighestfirst', 'forum'),
+                  FORUM_MODE_FLATRATEDLOWEST => get_string('modeflatratedlowestfirst', 'forum'));
 }
 
 /**
